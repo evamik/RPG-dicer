@@ -1,0 +1,1 @@
+This project allows users to roll the dice in sync with other users using the website, limits their ability to cheat.
