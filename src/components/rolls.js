@@ -6,7 +6,7 @@ const Roll = props => (
     <tr>
         <td><a style={{color: `rgb(${props.roll.R}, ${props.roll.G}, ${props.roll.B})`}}>llll </a>{props.roll.date}</td>
         <td>{props.roll.username}</td>
-        <td>{`${props.roll.rollCount}d${props.roll.rollSize}`}</td>
+        <td>{`${props.roll.rollCount}d${props.roll.rollSize}+${props.roll.rollBonus} ${props.roll.ownDice ? '(own dice)' : ''}`}</td>
         <td>{props.roll.rollResult}</td>
         <td>{props.roll.description}</td>
     </tr>
@@ -33,17 +33,11 @@ class Rolls extends Component {
                 rolls: [...state.rolls.slice(1), rll]
             }));
           });
-
-        /*Axios.get('http://localhost:5000/rolls/')
-            .then(res => {
-                this.setState({rolls: res.data})
-            })
-            .catch((error) => { console.log(error)})*/
     }
 
     rollList() {
         return this.state.rolls.map(currentroll => {
-            return <Roll roll={currentroll} key={currentroll.id}/>
+            return <Roll roll={currentroll} key={currentroll._id}/>
         })
     }
 

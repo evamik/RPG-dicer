@@ -19,10 +19,12 @@ router.route('/add').post((req, res) => {
     const rollCount = Number(req.body.rollCount)
     const rollSize = Number(req.body.rollSize)
     const rollResult = Number(req.body.rollResult)
+    const rollBonus = Number(req.body.rollBonus)
     const date = Date.parse(req.body.date);
     const R = Number(req.body.R)
     const G = Number(req.body.G)
     const B = Number(req.body.B)
+    const ownDice = Boolean(req.body.ownDice)
 
     const newRoll = new Roll({
         username,
@@ -30,10 +32,12 @@ router.route('/add').post((req, res) => {
         rollCount,
         rollSize,
         rollResult,
+        rollBonus,
         date,
         R,
         G,
-        B
+        B,
+        ownDice
     });
 
     newRoll.save()

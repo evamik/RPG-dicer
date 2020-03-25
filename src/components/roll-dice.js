@@ -1,5 +1,4 @@
 import React, { Component }  from 'react';
-import axios from 'axios';
 import io from 'socket.io-client'
 
 export default class RollDice extends Component {
@@ -11,7 +10,10 @@ export default class RollDice extends Component {
         this.onChangeDescription = this.onChangeDescription.bind(this);
         this.onChangeRollCount = this.onChangeRollCount.bind(this);
         this.onChangeRollSize = this.onChangeRollSize.bind(this);
+        this.onChangeRollBonus = this.onChangeRollBonus.bind(this);
+        this.onChangeResult = this.onChangeResult.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
+        this.onChangeOwnDice = this.onChangeOwnDice.bind(this);
 
         this.state = {
             username: '',
@@ -19,10 +21,12 @@ export default class RollDice extends Component {
             rollCount: 1,
             rollSize: 20,
             rollResult: 0,
+            rollBonus: 0,
             date: new Date(),
             R: 0,
             G: 0,
-            B: 0
+            B: 0,
+            ownDice: false
         }
     }
 
@@ -58,32 +62,55 @@ export default class RollDice extends Component {
         })
     }
 
-    onSubmit(e) {
-        e.preventDefault();
+    onChangeRollBonus(e){
+        this.setState({
+            rollBonus: e.target.value
+        })
+    }
+
+    onChangeResult(e){
+        this.setState({
+            rollResult: e.target.value
+        })
+    }
+
+    onChangeOwnDice(e){
+        this.setState({
+            ownDice: e.target.checked
+        })
+    }
+
+    onSubmit(size) {
+        if(this.state.username.length === 0)
+            return
 
         let result = 0;
 
         for(var i = 0; i < this.state.rollCount; i++) {
-            result += Math.round( 1 + Math.random() * (this.state.rollSize-1));
+            result += Math.round( 1 + Math.random() * (size-1));
         }
+        result += Math.round(this.state.rollBonus)
+
+        console.log(this.state.ownDice)
+
+        if(this.state.ownDice === true)
+            result = this.state.rollResult
 
         const roll = {
             username: this.state.username,
             description: this.state.description,
             rollCount: this.state.rollCount,
-            rollSize: this.state.rollSize,
+            rollSize: size,
             rollResult: result,
+            rollBonus: this.state.rollBonus,
             date: `${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}`,
             R: this.state.R,
             G: this.state.G,
             B: this.state.B,
+            ownDice: this.state.ownDice
         }
 
         this.socket.emit('roll', roll)
-
-        console.log(roll)
-        /*axios.post('http://localhost:5000/rolls/add', roll)
-            .then(res => console.log(res.data));*/
     }
 
     componentDidMount(){
@@ -111,9 +138,9 @@ export default class RollDice extends Component {
         return (
             <div className="">
                 <h3>Roll your dice!</h3>
-                <form className="row align-items-end flex-wrap" onSubmit={this.onSubmit}>
-                    <div className="px-2 form-group" style={{width: 250}}>
-                        <label>Player: </label>
+                <div className="row flex-wrap align-items-end">
+                    <div className="px-2" style={{width: 250}}>
+                        <label className="mb-0">Player: </label>
                         <input type="text"
                             required
                             className="form-control"
@@ -121,16 +148,18 @@ export default class RollDice extends Component {
                             onChange={this.onChangeUsername}
                         />
                     </div>
-                    <div className="px-2 form-group" style={{width: 400}}>
-                        <label>Rolling for: </label>
+                    <div className="px-2" style={{width: 400}}>
+                        <label className="mb-0">Rolling for: </label>
                         <input type="text"
                             className="form-control"
                             value={this.state.description}
                             onChange={this.onChangeDescription}
                         />
                     </div>
-                    <div className="px-2 form-group" style={{width: 100}}>
-                        <label>Roll count: </label>
+                </div>
+                <div className="row flex-wrap align-items-end">
+                    <div className="pl-2" style={{width: 75}}>
+                        <label className="mb-0">count:</label>
                         <input type="number"
                             required
                             className="form-control"
@@ -138,8 +167,64 @@ export default class RollDice extends Component {
                             onChange={this.onChangeRollCount}
                         />
                     </div>
-                    <div className="px-2 form-group" style={{width: 90}}>
-                        <label>Roll size: </label>
+                    <div className="mb-1 pr-3">d</div>
+                    <div className="mb-1">+</div>
+                    <div className="" style={{width: 90}}>
+                        <label className="mb-0">bonus:</label>
+                        <input type="number"
+                            required
+                            className="form-control"
+                            value={this.state.rollBonus}
+                            onChange={this.onChangeRollBonus}
+                        />
+                    </div>
+                    <div className="ml-5" style={{width: 150}}>
+                        <label className="mb-0">my own dice result:</label>
+                        <input type="number"
+                            className="form-control"
+                            value={this.state.rollResult}
+                            onChange={this.onChangeResult}
+                        />
+                    </div>
+                    <div className="ml-2">
+                        <input type="checkbox" value={this.state.ownDice} 
+                        onChange={this.onChangeOwnDice}/>
+                        <label className="pl-1">use my dice result</label>
+                    </div>
+                </div>
+                <div className="row align-items-end p-2">
+                    <div className="pr-2">
+                        <button onClick={() => this.onSubmit(4)} 
+                        className="btn btn-primary">d4</button>
+                    </div>
+                    <div className="pr-2">
+                        <button onClick={() => this.onSubmit(6)} 
+                        className="btn btn-primary">d6</button>
+                    </div>
+                    <div className="pr-2">
+                        <button onClick={() => this.onSubmit(8)} 
+                        className="btn btn-primary">d8</button>
+                    </div>
+                    <div className="pr-2">
+                        <button onClick={() => this.onSubmit(10)} 
+                        className="btn btn-primary">d10</button>
+                    </div>
+                    <div className="pr-2">
+                        <button onClick={() => this.onSubmit(12)} 
+                        className="btn btn-primary">d12</button>
+                    </div>
+                    <div className="pr-2">
+                        <button onClick={() => this.onSubmit(20)} 
+                        className="btn btn-primary">d20</button>
+                    </div>
+                    <div className="pr-2">
+                        <button onClick={() => this.onSubmit(100)} 
+                        className="btn btn-primary">d100</button>
+                    </div>
+                </div>
+                <div className="row align-items-end px-2">
+                    <div className="pr-2" style={{width: 100}}>
+                        <label className="mb-0">custom size:</label>
                         <input type="number"
                             required
                             className="form-control"
@@ -147,10 +232,11 @@ export default class RollDice extends Component {
                             onChange={this.onChangeRollSize}
                         />
                     </div>
-                    <div className="px-2 align-self-end form-group">
-                        <input type="submit" value="Try your luck" className="btn btn-primary"/>
+                    <div className="pr-2">
+                        <button onClick={() => this.onSubmit(this.state.rollSize)} 
+                        className="btn btn-primary">submit</button>
                     </div>
-                </form>
+                </div>
             </div>
         )
     }

@@ -40,10 +40,12 @@ io.on('connection', (socket) => {
         rollCount: rll.rollCount,
         rollSize: rll.rollSize,
         rollResult: rll.rollResult,
+        rollBonus: rll.rollBonus,
         date: rll.date,
         R: rll.R,
         G: rll.G,
-        B: rll.B
+        B: rll.B,
+        ownDice: rll.ownDice
       });
   
       roll.save((err) => {
