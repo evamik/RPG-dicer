@@ -114,7 +114,13 @@ export default class RollDice extends Component {
     }
 
     componentDidMount(){
-        this.socket = io(`${window.location.hostname}:5000`);
+        const socketURL =
+        process.env.NODE_ENV === 'production'
+            ? '/'
+            : `http://localhost:5000`;
+
+        //this.socket = io.connect(socketURL, {secure: true});
+        this.socket = io(`${socketURL}`);
 
         fetch("https://api.ipify.org?format=json")
         .then(response => {
