@@ -6,8 +6,8 @@ const path = require('path')
 require('dotenv').config();
 
 const app = express();
-const http = require('http').Server(app)
-const io = require('socket.io')(http)
+const http = require('http').createServer(app)
+const io = require('socket.io').listen(http)
 const port = process.env.PORT || 5000;
 
 app.use(cors());
@@ -26,7 +26,7 @@ app.use('api/rolls', rollsRouter);
 
 const Roll = require('./models/roll')
 
-io.on('connection', (socket) => {
+io.sockets.on('connection', (socket) => {
 
     Roll.find().sort({createdAt: -1}).limit(10).exec((err, rolls) => {
       if (err) return console.error(err);
