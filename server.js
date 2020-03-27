@@ -10,8 +10,6 @@ const http = require('http').createServer(app);
 app.set('port', (process.env.PORT || 5000))
 const io = require('socket.io')(http)
 
-
-
 app.use(cors());
 app.use(express.json());
 
@@ -68,6 +66,6 @@ if(process.env.NODE_ENV === 'production') {
   });
 }
 
-http.listen(3000, () => {
-  console.log('listening on *:3000');
+http.listen(app.get('port'), () => {
+  console.log(`listening on ${app.get('port')}`);
 });
