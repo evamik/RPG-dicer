@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
+const path = require('path')
 
 require('dotenv').config();
 
@@ -21,7 +22,7 @@ connection.once('open', () => {
 
 const rollsRouter = require('./routes/rolls');
 
-app.use('/rolls', rollsRouter);
+app.use('api/rolls', rollsRouter);
 
 const Roll = require('./models/roll')
 
@@ -56,8 +57,12 @@ io.on('connection', (socket) => {
     });
 });
 
+app.use(express.static(path.join(__dirname, 'client/build')));
+
 if(process.env.NODE_ENV === 'production') {
-  app.use(express.static('client'))
+  app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname+'/client/build/index.html'));
+  });
 }
   
 http.listen(port, () => {
