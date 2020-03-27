@@ -6,11 +6,11 @@ const path = require('path')
 require('dotenv').config();
 
 const app = express();
+const http = require('http').createServer(app);
 app.set('port', (process.env.PORT || 5000))
-const server = app.listen(app.get('port'), () => {
-  console.log(`running on port: ${app.get('port')}`)
-})
-const io = require('socket.io')(server)
+const io = require('socket.io')(http)
+
+
 
 app.use(cors());
 app.use(express.json());
@@ -29,6 +29,7 @@ app.use('api/rolls', rollsRouter);
 const Roll = require('./models/roll')
 
 io.on('connection', (socket) => {
+    console.log('a user connected')
 
     Roll.find().sort({createdAt: -1}).limit(10).exec((err, rolls) => {
       if (err) return console.error(err);
@@ -66,3 +67,7 @@ if(process.env.NODE_ENV === 'production') {
     res.sendFile(path.join(__dirname+'/client/build/index.html'));
   });
 }
+
+http.listen(3000, () => {
+  console.log('listening on *:3000');
+});
