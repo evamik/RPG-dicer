@@ -20,13 +20,14 @@ class Rolls extends Component {
     }
 
     componentDidMount(){
-        const socketURL =
+        /*const socketURL =
         process.env.NODE_ENV === 'production'
             ? '/'
             : `http://localhost:5000`;
 
         //this.socket = io.connect(socketURL, {secure: true});
-        this.socket = io(`${socketURL}`);
+        this.socket = io(`${socketURL}`);*/
+        this.socket = io();
 
         this.socket.on('init', (rll) => {
             this.setState((state) => ({
