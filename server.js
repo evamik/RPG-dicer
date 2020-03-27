@@ -55,6 +55,10 @@ io.on('connection', (socket) => {
       socket.broadcast.emit('push', rll);
     });
 });
+
+if(process.env.NODE_ENV === 'production') {
+  app.use(express.static('client'))
+}
   
 http.listen(port, () => {
     console.log('listening on *:' + port);
