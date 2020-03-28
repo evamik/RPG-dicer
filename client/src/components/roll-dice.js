@@ -91,7 +91,7 @@ export default class RollDice extends Component {
         let result = 0;
 
         for(var i = 0; i < this.state.rollCount; i++) {
-            result = Math.round(Math.random()*size-1)+1
+            result = Math.round(Math.random()*(size-1))+1
             if(this.state.ownDice === true)
                 result = this.state.rollResult
 
