@@ -1,32 +1,69 @@
 import React, { Component } from 'react';
-import Axios from 'axios';
 import io from 'socket.io-client'
+import Popup from 'reactjs-popup'
 
-const Roll = props => (
-    <tr>
-        <td><a style={{color: `rgb(${props.roll.R}, ${props.roll.G}, ${props.roll.B})`}}>llll </a>{props.roll.date}</td>
-        <td>{props.roll.username}</td>
-        <td>{`${props.roll.rollCount}d${props.roll.rollSize}+${props.roll.rollBonus} ${props.roll.ownDice ? '(own dice)' : ''}`}</td>
-        <td>{props.roll.rollResult}</td>
-        <td>{props.roll.description}</td>
-    </tr>
-)
+class Roll extends Component {
+    render() {
+        return(
+            <tr>
+                <td>{`1d${this.props.roll.rollSize} ${this.props.roll.ownDice ? '(own dice)' : ''}`}</td>
+                <td>{this.props.roll.rollResult}</td>
+                <td>{this.props.roll.description}</td>
+            </tr>
+        )
+    }
+}
+
+class RollContainer extends Component {
+    rollList() {
+        return this.props.roll.rolls.map((currentroll, index) => {
+            return <Roll onPopup={this.openPopup} roll={currentroll} key={index}/>
+        })
+    }
+
+    render() {
+        return(
+            <tr>
+                <td><a style={{color: `rgb(${this.props.roll.R}, ${this.props.roll.G}, ${this.props.roll.B})`}}>llll </a>{this.props.roll.date}</td>
+                <td>{this.props.roll.username}</td>
+                <td><Popup trigger={<button 
+                    onClick={() => {this.props.onPopup(this.props.roll.rolls)}} 
+                    className="btn btn-info">{this.props.roll.result}
+                </button>}
+                modal closeOnDocumentClick>
+                    <div>
+                        <h3>Rolls log</h3>
+                        <table className="table">
+                        <thead className="thead-light">
+                            <tr>
+                                <th>roll type</th>
+                                <th>rolled</th>
+                                <th>rolled for</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            { this.rollList() } 
+                        </tbody>
+                        </table>
+                        bonus: +{this.props.roll.bonus}
+                    </div>
+                </Popup></td>
+                <td>{this.props.roll.description}</td>
+            </tr>
+        )
+    }
+}
 
 class Rolls extends Component {
     constructor(props) {
         super(props);
 
-        this.state = {rolls: []};
+        this.state = {
+            rolls: [],
+        };
     }
 
     componentDidMount(){
-        /*const socketURL =
-        process.env.NODE_ENV === 'production'
-            ? '/'
-            : `http://localhost:5000`;
-
-        //this.socket = io.connect(socketURL, {secure: true});
-        this.socket = io(`${socketURL}`);*/
         this.socket = io();
 
         this.socket.on('init', (rll) => {
@@ -36,15 +73,20 @@ class Rolls extends Component {
         })
 
         this.socket.on('push', (rll) => {
-            this.setState((state) => ({
-                rolls: [...state.rolls.slice(1), rll]
-            }));
+            if(this.state.rolls.length === 10)
+                this.setState((state) => ({
+                    rolls: [...state.rolls.slice(1), rll]
+                }));
+            else 
+                this.setState((state) => ({
+                    rolls: [...state.rolls, rll]
+                }));
           });
     }
 
     rollList() {
         return this.state.rolls.map(currentroll => {
-            return <Roll roll={currentroll} key={currentroll._id}/>
+            return <RollContainer roll={currentroll} key={currentroll._id}/>
         })
     }
 
@@ -57,13 +99,12 @@ class Rolls extends Component {
                     <tr>
                     <th></th>
                     <th>Username</th>
-                    <th>roll type</th>
                     <th>rolled</th>
                     <th>rolled for</th>
                     </tr>
                 </thead>
                 <tbody>
-                    { this.rollList() }
+                    { this.rollList() } 
                 </tbody>
                 </table>
             </div>

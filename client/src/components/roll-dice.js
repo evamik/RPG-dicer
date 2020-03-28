@@ -13,9 +13,11 @@ export default class RollDice extends Component {
         this.onChangeRollBonus = this.onChangeRollBonus.bind(this);
         this.onChangeResult = this.onChangeResult.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
+        this.onSubmitAll = this.onSubmitAll.bind(this);
         this.onChangeOwnDice = this.onChangeOwnDice.bind(this);
 
         this.state = {
+            id: 0,
             username: '',
             description: '',
             rollCount: 1,
@@ -26,7 +28,9 @@ export default class RollDice extends Component {
             R: 0,
             G: 0,
             B: 0,
-            ownDice: false
+            ownDice: false,
+            rolls: [],
+            canSubmitAll: false
         }
     }
 
@@ -87,30 +91,61 @@ export default class RollDice extends Component {
         let result = 0;
 
         for(var i = 0; i < this.state.rollCount; i++) {
-            result += Math.round( 1 + Math.random() * (size-1));
+            result = Math.round(Math.random()*size-1)+1
+            if(this.state.ownDice === true)
+                result = this.state.rollResult
+
+            const roll = {
+                description: this.state.description,
+                rollSize: size,
+                rollResult: result,
+                ownDice: this.state.ownDice
+            }
+
+            this.setState((state) => ({
+                rolls: [...state.rolls, roll]
+            }))
+            
+            if(this.state.ownDice === true)
+                break;
         }
-        result += Math.round(this.state.rollBonus)
 
-        console.log(this.state.ownDice)
+        this.setState({
+            canSubmitAll: true
+        })
+    }
 
-        if(this.state.ownDice === true)
-            result = this.state.rollResult
+    onSubmitAll(){
+        var _result = 0
+        for(var i = 0; i < this.state.rolls.length; i++) {
+            _result += Math.round(this.state.rolls[i].rollResult)
+        }
+        _result += Math.round(this.state.rollBonus)
 
-        const roll = {
+        const rollContainer = {
             username: this.state.username,
             description: this.state.description,
-            rollCount: this.state.rollCount,
-            rollSize: size,
-            rollResult: result,
-            rollBonus: this.state.rollBonus,
             date: `${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}`,
+            result: _result,
+            bonus: this.state.rollBonus,
             R: this.state.R,
             G: this.state.G,
             B: this.state.B,
-            ownDice: this.state.ownDice
+            rolls: this.state.rolls
         }
 
-        this.socket.emit('roll', roll)
+        this.setState({
+            description: '',
+            rollCount: 1,
+            rollSize: 20,
+            rollResult: 0,
+            rollBonus: 0,
+            ownDice: false,
+            rolls: [],
+            canSubmitAll: false
+        })
+
+        this.socket.emit('roll', rollContainer)
     }
 
     componentDidMount(){
@@ -122,9 +157,8 @@ export default class RollDice extends Component {
         }, "jsonp")
         .then(res => {
             console.log(res.ip);
-            const ip_array = res.ip.split('.')      // Returns array of the string above separated by ".". ["::ffff:192","168","0","1"]
-
-            // The switch statement checks the value of the array above for the index of 2. This would be "0"
+            const ip_array = res.ip.split('.')
+            
             this.setState({
                 R: ip_array[0],
                 G: ip_array[1],
@@ -163,25 +197,17 @@ export default class RollDice extends Component {
                         <input type="number"
                             required
                             className="form-control"
+                            disabled={this.state.ownDice}
                             value={this.state.rollCount}
                             onChange={this.onChangeRollCount}
                         />
                     </div>
                     <div className="mb-1 pr-3">d</div>
-                    <div className="mb-1">+</div>
-                    <div className="" style={{width: 90}}>
-                        <label className="mb-0">bonus:</label>
-                        <input type="number"
-                            required
-                            className="form-control"
-                            value={this.state.rollBonus}
-                            onChange={this.onChangeRollBonus}
-                        />
-                    </div>
                     <div className="ml-5" style={{width: 150}}>
                         <label className="mb-0">my own dice result:</label>
                         <input type="number"
                             className="form-control"
+                            disabled={!this.state.ownDice}
                             value={this.state.rollResult}
                             onChange={this.onChangeResult}
                         />
@@ -236,6 +262,22 @@ export default class RollDice extends Component {
                         <button onClick={() => this.onSubmit(this.state.rollSize)} 
                         className="btn btn-primary">submit</button>
                     </div>
+                </div>
+                <div className="row align-items-end px-2">
+                    <h3 className="mr-2">dices rolled: {this.state.rolls.length}</h3>
+                    <div className="mb-1">+</div>
+                    <div className="" style={{width: 90}}>
+                        <label className="mb-0">bonus:</label>
+                        <input type="number"
+                            required
+                            className="form-control"
+                            value={this.state.rollBonus}
+                            onChange={this.onChangeRollBonus}
+                        />
+                    </div>
+                    <button onClick={() => this.onSubmitAll()} 
+                        className="btn btn-primary"
+                        disabled={!this.state.canSubmitAll}>submit all</button>
                 </div>
             </div>
         )

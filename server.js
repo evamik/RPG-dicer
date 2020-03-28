@@ -24,33 +24,31 @@ const rollsRouter = require('./routes/rolls');
 
 app.use('api/rolls', rollsRouter);
 
-const Roll = require('./models/roll')
+const RollContainer = require('./models/rollContainer')
 
 io.on('connection', (socket) => {
     console.log('a user connected')
 
-    Roll.find().sort({createdAt: -1}).limit(10).exec((err, rolls) => {
-      if (err) return console.error(err);
+    RollContainer.find().sort({createdAt: -1}).limit(10).exec((err, rolls) => {
+      if (err) return console.error("erroras: "+err);
   
       socket.emit('init', rolls.reverse());
     });
   
     socket.on('roll', (rll) => {
-      const roll = new Roll({
+      const rollContainer = new RollContainer({
         username: rll.username,
         description: rll.description,
-        rollCount: rll.rollCount,
-        rollSize: rll.rollSize,
-        rollResult: rll.rollResult,
-        rollBonus: rll.rollBonus,
         date: rll.date,
+        result: rll.result,
+        bonus: rll.bonus,
         R: rll.R,
         G: rll.G,
         B: rll.B,
-        ownDice: rll.ownDice
+        rolls: rll.rolls
       });
   
-      roll.save((err) => {
+      rollContainer.save((err) => {
         if (err) return console.error(err);
       });
   

@@ -13,7 +13,8 @@ const rollSchema = new Schema({
     R: { type: Number, required: true},
     G: { type: Number, required: true},
     B: { type: Number, required: true},
-    ownDice: { type: Boolean, required: true}
+    ownDice: { type: Boolean, required: true},
+    rollID: { type: Number, required: true}
 },{
     timestamps: true,
 });
