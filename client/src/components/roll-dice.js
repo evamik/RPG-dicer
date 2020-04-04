@@ -126,7 +126,7 @@ export default class RollDice extends Component {
         const rollContainer = {
             username: this.state.username,
             description: this.state.description,
-            date: Moment(new Date()).format('HH:mm:ss'),
+            date: "",
             result: _result,
             bonus: this.state.rollBonus,
             R: this.state.R,

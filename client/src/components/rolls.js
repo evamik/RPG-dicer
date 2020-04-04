@@ -132,7 +132,7 @@ class Rolls extends Component {
     }
 
     handleReset() {
-        this.socket.emit('resetInitiative', new Date())
+        this.socket.emit('resetInitiative', "now")
     }
 
     rollList() {

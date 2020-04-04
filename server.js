@@ -55,7 +55,12 @@ io.on('connection', (socket) => {
     }
     
     socket.on('resetInitiative', (date) => {
+      if(date === "now") date = new Date()
       const datetime = moment(date).format('YYYY-MM-DDTHH:mm:ss')
+      if(date === ''){
+        resetInitiative(date)
+        return
+      }
       const initiativeReset = new InitiativeReset({
         date: datetime
       })
@@ -95,7 +100,7 @@ io.on('connection', (socket) => {
       const rollContainer = new RollContainer({
         username: rll.username,
         description: rll.description,
-        date: rll.date,
+        date: Moment(new Date()).format('HH:mm:ss'),
         result: rll.result,
         bonus: rll.bonus,
         R: rll.R,
