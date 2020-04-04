@@ -64,6 +64,7 @@ io.on('connection', (socket) => {
       const initiativeReset = new InitiativeReset({
         date: datetime
       })
+      console.log(datetime)
       initiativeReset.save((err) => {
         if (err) return console.error(err);
         resetInitiative(datetime)
@@ -100,7 +101,7 @@ io.on('connection', (socket) => {
       const rollContainer = new RollContainer({
         username: rll.username,
         description: rll.description,
-        date: Moment(new Date()).format('HH:mm:ss'),
+        date: moment(new Date()).format('HH:mm:ss'),
         result: rll.result,
         bonus: rll.bonus,
         R: rll.R,
@@ -113,7 +114,7 @@ io.on('connection', (socket) => {
         if (err) return console.error(err);
       });
   
-      socket.broadcast.emit('push', rll);
+      io.emit('push', rollContainer);
     });
 
     socket.on('disconnect', () => {
