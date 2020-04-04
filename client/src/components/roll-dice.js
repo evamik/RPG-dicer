@@ -1,5 +1,6 @@
 import React, { Component }  from 'react';
 import io from 'socket.io-client'
+import Moment from 'moment'
 
 export default class RollDice extends Component {
 
@@ -125,7 +126,7 @@ export default class RollDice extends Component {
         const rollContainer = {
             username: this.state.username,
             description: this.state.description,
-            date: `${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}`,
+            date: Moment(new Date()).format('HH:mm:ss'),
             result: _result,
             bonus: this.state.rollBonus,
             R: this.state.R,
@@ -146,6 +147,19 @@ export default class RollDice extends Component {
         })
 
         this.socket.emit('roll', rollContainer)
+    }
+
+    onClearRolls() {
+        this.setState({
+            description: '',
+            rollCount: 1,
+            rollSize: 20,
+            rollResult: 0,
+            rollBonus: 0,
+            ownDice: false,
+            rolls: [],
+            canSubmitAll: false
+        })
     }
 
     componentDidMount(){
@@ -278,6 +292,9 @@ export default class RollDice extends Component {
                     <button onClick={() => this.onSubmitAll()} 
                         className="btn btn-primary"
                         disabled={!this.state.canSubmitAll}>submit all</button>
+                    <button onClick={() => this.onClearRolls()} 
+                        className="btn btn-warning"
+                        disabled={!this.state.canSubmitAll}>clear rolls</button>
                 </div>
             </div>
         )

@@ -7,9 +7,11 @@ import Rolls from './components/rolls';
 
 function App() {
   return (
-    <div className="container">
-      <Rolls/>
-      <RollDice />
+    <div className="bg-dark text-white">
+      <div className="container">
+        <Rolls/>
+        <RollDice />
+      </div>
     </div>
   );
 }
