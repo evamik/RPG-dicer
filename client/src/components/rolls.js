@@ -167,8 +167,8 @@ class Rolls extends Component {
                         <a className="ml-1 mb-2">(Rolling for: init)</a>
                         <button className="ml-2 btn btn-sm my-2 py-0 btn-warning"
                                 onClick={this.handleReset}>reset</button>
-                        <h6 className="pl-2 mt-2" style={{color:"#5b6671"}}>last reset: {this.state.resetDate}</h6>
                     </div>
+                        <h6 className="pl-2 mt-2" style={{color:"#5b6671"}}>last reset: {this.state.resetDate}</h6>
                     <table className="table table-dark table-sm">
                         <thead className="thead-dark">
                             <tr>
