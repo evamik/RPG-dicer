@@ -46,7 +46,7 @@ io.on('connection', (socket) => {
 
         if(el.length !== 0) date = el[0].date
 
-        RollContainer.find({ createdAt: { $gte: date, $lte: endDate}, description: "initiative"}).sort({ createdAt: 1}).exec((err, rolls) => {
+        RollContainer.find({ createdAt: { $gte: date, $lte: endDate}, description: "init"}).sort({ createdAt: 1}).exec((err, rolls) => {
           if(err) return console.error(err)
     
           io.emit('initiative', {rolls: rolls, date: date})

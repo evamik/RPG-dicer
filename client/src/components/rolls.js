@@ -84,17 +84,23 @@ class Rolls extends Component {
 
         this.socket.on('initiative', data => {
             this.setState((state) => ({
-                inits: data.rolls,
+                inits: data.rolls
+                    .sort((a, b) => b.result - a.result),
                 resetDate: data.date
             }))
         })
 
         this.socket.on('removeAndAdd', (rll) => {
-            let rolls = [rll[1], ...this.state.rolls.filter(r => r._id !== rll[0]._id)]
+            let rolls = [rll[1], ...this.state.rolls
+                .filter(r => r._id !== rll[0]._id)]
+            let inits = [...this.state.inits
+                .filter(r => r._id !== rll[0]._id)]
+                .sort((a, b) => b.result - a.result)
             if(rll[1] === "")
                 rolls = [...rolls.slice(1)]
             this.setState((state) => ({
-                rolls: rolls
+                rolls: rolls,
+                inits: inits
                 }))
         })
 
@@ -107,9 +113,9 @@ class Rolls extends Component {
                 this.setState((state) => ({
                     rolls: [...state.rolls, rll]
                 }));
-            if(rll.description === "initiative"){
+            if(rll.description === "init"){
                     this.setState((state) => ({
-                        inits: [...state.inits, rll]
+                        inits: [...state.inits, rll].sort((a, b) => b.result - a.result)
                     }));
             }
           });
@@ -156,8 +162,9 @@ class Rolls extends Component {
                     </table>
                 </div>
                 <div style={{marginLeft:80}}>
-                    <div className="row">
+                    <div className="row align-items-end">
                         <h3>Initiative rolls</h3>
+                        <a className="ml-1 mb-2">(Rolling for: init)</a>
                         <button className="ml-2 btn btn-sm my-2 py-0 btn-warning"
                                 onClick={this.handleReset}>reset</button>
                         <h6 className="pl-2 mt-2" style={{color:"#5b6671"}}>last reset: {this.state.resetDate}</h6>
